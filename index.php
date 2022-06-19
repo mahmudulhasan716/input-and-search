@@ -1,66 +1,40 @@
 <?php
-
 require_once 'vendor/autoload.php';
 
 use App\Database;
+use App\Insert;
+use App\Search;
 
-$con= new Database();
+
+$con = new Database();
+$insert = new Insert();
+$search = new Search();
+
+
 
 if(isset($_POST['create_database'])){
-    $host = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname= "test";
-    $sql = "CREATE DATABASE $dbname";
+    $result= $con->db_create();
+}
 
-    $conn = new mysqli($host, $username, $password);
-
-    if (mysqli_query($conn, $sql)){
-        
-       
-        $host = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname= "test";
-    
-            $table_conn = mysqli_connect($host, $username, $password, $dbname);
-    
-            $table_sql= "CREATE TABLE search ( id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, text VARCHAR(30) NOT NULL, status TINYINT(1) NOT NULL )";
-    
-            if (mysqli_query($table_conn, $table_sql)) {
-                echo " created successfully";
-              } else{
-                echo "table create failed";
-              }
-
-    }else{
-        echo 'create failed';
-    }
+if(isset($_POST['create_table_database'])){
+    $result= $con->db_table_create();
 }
 
 
+if(isset($_POST['insert_text'])){
 
-
-if(isset($_POST['submit'])){
-    $text = $_POST['text'];
-    $status = $_POST['status'];
-
-    echo $con->Savetext($_POST);
+    $result= $insert->insert($_POST);
 
 }
 
 
-if(isset($_GET['submit'])){
-    $search = $_GET['text'];
-
-    $search= $con->Searchtext($_GET);
-
-    while($row= mysqli_fetch_assoc($search)){
-         echo $row['text'];
-     }  
+if(isset($_GET['search_data'])){
+    $result= $search->search($_GET);
+    
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -71,28 +45,37 @@ if(isset($_GET['submit'])){
     <title>Document</title>
 </head>
 <body>
-    <h2>database connection</h2>
+
+<h2>database connection</h2>
     <form method="post">
         <input type="submit" name="create_database" value="Create Database">
     </form>
 
-
-
-    <h2> Insert Data</h2>
+    <h2>database table connection</h2>
     <form method="post">
-        <input type="text" name="text" placeholder="input your text here" >
+        <input type="submit" name="create_table_database" value="Create Database">
+    </form>
+
+
+    <h2> insert text</h2>
+    <form method="post">
+        <input type="text" name="text" placeholder="enter your text">
         <select name="status">
             <option value=""> select </option>
             <option value="1"> active</option>
             <option value="0"> inactive </option>
         </select>
-        <input type="submit" name="submit">
+        <input type="submit" name="insert_text" >
     </form>
+
+
 
     <h2> search data</h2>
     <form method="get">
         <input type="text" name="text" placeholder="search data " >
-        <input type="submit" name="submit">
+        <input type="submit" name="search_data">
     </form>
+
+
 </body>
 </html>
